@@ -24,13 +24,12 @@
 #
 ########################################################################
 
+import os
 
 import idc 
 import idautils  
 import idaapi
 
-idaapi.require('flare')
-idaapi.require('flare.shellcode_hash_search')
 
 class shellcode_search_plugin_t(idaapi.plugin_t):
     flags = idaapi.PLUGIN_UNL
@@ -50,7 +49,10 @@ class shellcode_search_plugin_t(idaapi.plugin_t):
         pass
 
 def PLUGIN_ENTRY():
-    return shellcode_search_plugin_t()
-
-
-
+    if os.environ.get("IDA_IS_INTERACTIVE") != "1":
+        # running under idalib with no UI, bail
+        return None
+    else:
+        idaapi.require('flare')
+        idaapi.require('flare.shellcode_hash_search')
+        return shellcode_search_plugin_t()
